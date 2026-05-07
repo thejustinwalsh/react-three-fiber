@@ -38,12 +38,6 @@ export type WebGLShadowMap = never
 // <Environment>) that needs the renderer-appropriate flavor. In the WebGPU
 // build, the renderer-agnostic classes from `three/webgpu` are the canonical
 // choice; the legacy WebGL classes don't exist on this entry.
-// CubeRenderTarget is exported from `three/webgpu` at runtime since 0.181.x
-// but `@types/three@0.181.0` (our pin) doesn't declare the export — the type
-// declaration was added in `@types/three@0.183.1`. Suppress until the type
-// pin is bumped (separate PR — bumping currently surfaces unrelated drift in
-// useUniform/useUniforms hooks where `UniformNode.setName` typing changed).
-// @ts-expect-error - CubeRenderTarget type lag in @types/three@0.181.0
 export { RenderTarget as RenderTargetCompat, CubeRenderTarget as CubeRenderTargetCompat } from 'three/webgpu'
 // Stubs to prevent import errors in shared code (never instantiated due to
 // build flags — `R3F_BUILD_LEGACY === false` here, so any `new WebGLCubeRenderTarget()`

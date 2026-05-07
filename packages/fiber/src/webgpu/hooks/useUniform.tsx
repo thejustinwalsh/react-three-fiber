@@ -130,15 +130,20 @@ export function useUniform<T extends UniformValue>(name: string, value?: T): Uni
     // Case 4: Create new uniform ---------------------------------
     let node: UniformNode<Widen<T>>
 
+    // `uniform()` overloads accept a single concrete value type per signature
+    // (number | boolean | Vector2 | Vector3 | Color | …). Our `value` here is
+    // a hand-merged union, so it doesn't satisfy any single overload — we
+    // dispatch at runtime, then narrow the wrapper output via the existing
+    // `as unknown as UniformNode<Widen<T>>` cast.
     if (isTSLNode(value)) {
       // TSL nodes (color(), vec3(), float()) - pass directly for type casting
-      node = uniform(value) as unknown as UniformNode<Widen<T>>
+      node = uniform(value as any) as unknown as UniformNode<Widen<T>>
     } else if (typeof value === 'string') {
       // String colors - convert to Three.js Color
       node = uniform(new ThreeColor(value)) as unknown as UniformNode<Widen<T>>
     } else {
       // Raw values (number, Vector3, Color, etc.)
-      node = uniform(value) as unknown as UniformNode<Widen<T>>
+      node = uniform(value as any) as unknown as UniformNode<Widen<T>>
     }
 
     // Label for debugging

@@ -57,7 +57,10 @@ export const createStore = (
     ): Omit<Viewport, 'dpr' | 'initialDpr'> {
       const { width, height, top, left } = size
       const aspect = width / height
-      if ((target as Vector3).isVector3) tempTarget.copy(target as Vector3)
+      // Three.js sets `isVector3` on every Vector3 instance at runtime, but
+      // `@types/three@0.183+` declares the brand flag as `static`-only. Cast
+      // through the runtime shape to keep the duck-typed branch.
+      if ((target as { isVector3?: boolean }).isVector3) tempTarget.copy(target as Vector3)
       else tempTarget.set(...(target as Parameters<Vector3['set']>))
       const distance = camera.getWorldPosition(position).distanceTo(tempTarget)
       if (isOrthographicCamera(camera)) {

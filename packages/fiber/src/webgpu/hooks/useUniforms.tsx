@@ -446,7 +446,10 @@ function createUniform(inName: string, node: any, scope?: string): UniformNode {
   // - String colors: converted to THREE.Color
   // - Other values: passed through unchanged
   const inValue = vectorize(node)
-  const newUniform = uniform(inValue) as UniformNode
+  // `uniform()`'s overload set requires a single concrete value type — the
+  // dynamic input here covers every supported branch, so cast through `any`
+  // to dispatch and re-narrow the wrapper as `UniformNode`.
+  const newUniform = uniform(inValue as any) as UniformNode
 
   // Set debug name for easier identification in GPU tools
   // Use underscore instead of dot to ensure WGSL compatibility
@@ -458,25 +461,36 @@ function createUniform(inName: string, node: any, scope?: string): UniformNode {
   return newUniform
 }
 
+/**
+ * Structural duck-type for Three.js' instance-level `is*` brand flags.
+ * As of `@types/three@0.183+`, `isVector2` / `isVector3` / `isVector4`
+ * are declared as `static` on the class but Three.js still sets them on
+ * each instance at construction. We narrow against that runtime shape.
+ */
+type ThreeVectorBrand = {
+  isVector2?: boolean
+  isVector3?: boolean
+  isVector4?: boolean
+}
+
 /** Type guard for Three.js Vector2/3/4 */
 function isThreeVector(inVector: unknown): boolean {
   if (!inVector) return false
-  return (
-    (inVector as THREE.Vector2).isVector2 ||
-    (inVector as THREE.Vector3).isVector3 ||
-    (inVector as THREE.Vector4).isVector4
-  )
+  const brand = inVector as ThreeVectorBrand
+  return Boolean(brand.isVector2 || brand.isVector3 || brand.isVector4)
 }
 
 /** Type-safe equality check for Vector2/3/4 */
 function vectorEquals(a: unknown, b: unknown): boolean {
-  if ((a as THREE.Vector2).isVector2 && (b as THREE.Vector2).isVector2) {
+  const ba = a as ThreeVectorBrand
+  const bb = b as ThreeVectorBrand
+  if (ba.isVector2 && bb.isVector2) {
     return (a as THREE.Vector2).equals(b as THREE.Vector2)
   }
-  if ((a as THREE.Vector3).isVector3 && (b as THREE.Vector3).isVector3) {
+  if (ba.isVector3 && bb.isVector3) {
     return (a as THREE.Vector3).equals(b as THREE.Vector3)
   }
-  if ((a as THREE.Vector4).isVector4 && (b as THREE.Vector4).isVector4) {
+  if (ba.isVector4 && bb.isVector4) {
     return (a as THREE.Vector4).equals(b as THREE.Vector4)
   }
   return false

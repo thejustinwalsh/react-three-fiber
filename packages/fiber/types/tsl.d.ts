@@ -15,6 +15,12 @@ declare global {
   /** Uniform node type - a Node with a value property (matches Three.js UniformNode) */
   interface UniformNode<T = unknown> extends Node {
     value: T
+    /**
+     * Sets a debug label for this uniform. Available on `UniformNode` from
+     * Three.js but the surface for our local TSL augmentation has to opt in.
+     * Runtime calls are guarded by `typeof node.setName === 'function'`.
+     */
+    setName?: (name: string) => this
   }
 
   /**

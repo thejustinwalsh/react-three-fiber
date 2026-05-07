@@ -443,6 +443,12 @@ Changed the default shadow map type from `PCFSoftShadowMap` to `PCFShadowMap` to
 - Updated Husky to v9 and lint-staged to v16
 - Updated various dependencies to latest versions
 - Converted `verify-bundles.js` script to ES modules
+- Bumped `three` and `@types/three` from `^0.181` to `^0.184` and patched the resulting type drift:
+  - Added `@webgpu/types` as a direct dev dependency (no longer pulled transitively by `@types/three`) and registered it in the root `tsconfig.json` `types` so the `test-renderer` WebGPU mocks resolve `GPUDevice` / `GPUBufferDescriptor` / etc.
+  - Augmented the local `UniformNode<T>` global with an optional `setName` method to match the upstream node API. Existing runtime guards (`typeof node.setName === 'function'`) continue to gate the call.
+  - Updated `uniform()` call sites in `useUniform` / `useUniforms` to cast through `any` because the new overload set requires a single concrete value type per signature; the wrappers already re-narrow the result via `as unknown as UniformNode<…>`.
+  - Replaced direct instance-side `isVector2|isVector3|isVector4` reads with structural duck-type casts (`{ isVector2?: boolean }` etc.). Three.js still sets these brand flags on every instance at construction; `@types/three@0.183+` declares them `static`-only, so we narrow against the runtime shape instead of the static class.
+  - Removed the two `@ts-expect-error` directives on `CubeRenderTarget as CubeRenderTargetCompat` re-exports — `@types/three@0.184` now declares the export.
 
 ### Files Changed
 

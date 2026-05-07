@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@react-three/fiber": "workspace:*",
+    "@webgpu/types": "^0.1.68",
     "three": ">=0.181"
   }
 }
