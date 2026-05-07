@@ -34,7 +34,12 @@ export const WebGPURenderer = class WebGPURenderer {
 }
 
 //* RenderTarget Compatibility ==============================
-// Alias WebGLRenderTarget for useRenderTarget hook
-export { WebGLRenderTarget as RenderTargetCompat } from 'three'
-// Stub to prevent import errors (never instantiated due to build flags)
+// Alias WebGLRenderTarget / WebGLCubeRenderTarget for shared code
+// (e.g. useRenderTarget, <Environment>) that needs the renderer-appropriate
+// flavor. The legacy build only ships the WebGL-prefixed classes from `three`.
+export { WebGLRenderTarget as RenderTargetCompat, WebGLCubeRenderTarget as CubeRenderTargetCompat } from 'three'
+// Stubs to prevent import errors in shared code (never instantiated due to
+// build flags — `R3F_BUILD_WEBGPU === false` here, so any `new CubeRenderTarget()`
+// branch is dead code that gets tree-shaken).
 export const RenderTarget = null as any
+export const CubeRenderTarget = null as any

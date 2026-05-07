@@ -33,10 +33,14 @@ export type { WebGLRendererParameters } from 'three/src/renderers/WebGLRenderer.
 
 //* RenderTarget Support ==============================
 // Default build needs both for runtime selection based on isLegacy
-export { WebGLRenderTarget } from 'three'
-// RenderTarget already exported via 'three/webgpu'
-// RenderTargetCompat alias for single-renderer build code paths (dead code in default build)
-export { RenderTarget as RenderTargetCompat } from 'three/webgpu'
+export { WebGLRenderTarget, WebGLCubeRenderTarget } from 'three'
+// RenderTarget / CubeRenderTarget already exported via 'three/webgpu'
+// *Compat aliases for single-renderer build code paths (dead code in default build).
+// CubeRenderTarget type declaration lags the runtime export — added in
+// @types/three@0.183.1 but our pin is ^0.181.0. Suppress until type pin
+// is bumped (separate PR; bumping surfaces TSL UniformNode drift).
+// @ts-expect-error - CubeRenderTarget type lag in @types/three@0.181.0
+export { RenderTarget as RenderTargetCompat, CubeRenderTarget as CubeRenderTargetCompat } from 'three/webgpu'
 
 //* Addons ==============================
 export { Inspector } from 'three/addons/inspector/Inspector.js'

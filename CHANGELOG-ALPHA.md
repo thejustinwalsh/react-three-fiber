@@ -421,6 +421,7 @@ Changed the default shadow map type from `PCFSoftShadowMap` to `PCFShadowMap` to
 - Fixed absolute Windows paths appearing in bundled type declarations by defining `FiberRoot` locally instead of importing from `react-reconciler`
 - Fixed eslint-plugin codegen script not awaiting prettier format before writing files
 - Fixed type exports in `reconciler.d.ts` and `three.d.ts` to properly export Three.js types
+- Fixed `<Environment>` import resolution in WebGPU and default builds. The component imported `WebGLCubeRenderTarget` from `#three`, which the WebGPU barrel re-exports from `three/webgpu` — but `three/webgpu` only exports the renderer-agnostic `CubeRenderTarget`, not the legacy WebGL-prefixed class. Vite's dep-scan would error with `No matching export in "three/build/three.webgpu.js" for import "WebGLCubeRenderTarget"` whenever a downstream project (e.g. StackBlitz fresh-install) tried to optimize the canary. Added a `CubeRenderTargetCompat` alias mirroring the existing `RenderTargetCompat` pattern so each build maps to the right concrete class — `WebGLCubeRenderTarget` (legacy/default builds) or `CubeRenderTarget` (webgpu/default builds).
 
 ### Examples
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useThree, createPortal, useFrame, extend, Euler, applyProps, ThreeElement } from '@react-three/fiber'
 import {
-  WebGLCubeRenderTarget,
+  CubeRenderTargetCompat,
   Texture,
   Scene,
   CubeCamera,
@@ -274,7 +274,7 @@ export function EnvironmentPortal({
   const camera = React.useRef<CubeCamera>(null!)
   const [virtualScene] = React.useState(() => new Scene())
   const fbo = React.useMemo(() => {
-    const fbo = new WebGLCubeRenderTarget(resolution)
+    const fbo = new CubeRenderTargetCompat(resolution)
     fbo.texture.type = HalfFloatType
     return fbo
   }, [resolution])
